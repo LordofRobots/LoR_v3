@@ -1,0 +1,77 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Arduino Lint
+        uses: arduino/arduino-lint-action@v1
+        with:
+          compliance: strict
+          library-manager: update
+
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+
+      - name: Configure Arduino CLI (add cores)
+        run: |
+          arduino-cli config init
+          arduino-cli config set board_manager.additional_urls \
+            https://dl.espressif.com/dl/package_esp32_index.json,\
+            https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json
+          arduino-cli core update-index
+
+      - name: Install ESP32 cores
+        run: |
+          # Espressif core (stable)
+          arduino-cli core install esp32:esp32
+          # Bluepad32 core (needed for on-device BP32 features)
+          arduino-cli core install esp32_bluepad32:esp32 || true
+
+      - name: Install Libraries
+        run: |
+          arduino-cli lib update-index
+          arduino-cli lib install "FastLED"
+          # Lock to 3.0.7 per your note
+          arduino-cli lib install "ESP32Servo@3.0.7"
+          arduino-cli lib install "Bluepad32"
+
+      - name: Compile examples (Espressif ESP32 Dev Module)
+        run: |
+          set -e
+          FQBN_ESP32="esp32:esp32:esp32"
+          for ex in $(find examples -name '*.ino'); do
+            echo "==> Compiling $ex for $FQBN_ESP32"
+            arduino-cli compile --fqbn "$FQBN_ESP32" "$ex"
+          done
+
+      - name: Compile examples (Espressif ESP32-S3)
+        run: |
+          set -e
+          FQBN_S3="esp32:esp32:esp32s3"
+          for ex in $(find examples -name '*.ino'); do
+            echo "==> Compiling $ex for $FQBN_S3"
+            arduino-cli compile --fqbn "$FQBN_S3" "$ex"
+          done
+
+      - name: Compile examples (Bluepad32 core)  # optional best-effort
+        continue-on-error: true
+        run: |
+          # Bluepad32’s FQBN name may vary by version. Commonly:
+          #   esp32_bluepad32:esp32:esp32
+          # If this fails, adjust to the exact FQBN shown by:
+          #   arduino-cli board listall | grep -i bluepad32 -A2
+          set -e
+          FQBN_BP32="esp32_bluepad32:esp32:esp32"
+          for ex in $(find examples -name '*.ino'); do
+            echo "==> Compiling $ex for $FQBN_BP32"
+            arduino-cli compile --fqbn "$FQBN_BP32" "$ex" || exit 0
+          done
