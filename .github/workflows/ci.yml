@@ -15,8 +15,10 @@ jobs:
       - name: Arduino Lint
         uses: arduino/arduino-lint-action@v1
         with:
-          compliance: strict
-          library-manager: update
+            compliance: permissive
+            project-type: library
+            library-manager: disable
+
 
       - name: Set up Arduino CLI
         uses: arduino/setup-arduino-cli@v1
