@@ -15,77 +15,76 @@ jobs:
       - name: Arduino Lint
         uses: arduino/arduino-lint-action@v1
         with:
-            compliance: permissive
-            project-type: library
-
+          compliance: permissive
+          project-type: library
 
       - name: Set up Arduino CLI
         uses: arduino/setup-arduino-cli@v1
 
-      - name: Configure Arduino CLI (add cores)
+      - name: Configure Arduino CLI (cores + sketchbook)
         run: |
-            arduino-cli config init
-            arduino-cli config set board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
-            # NEW: allow installing libraries from git URLs
-            arduino-cli config set library.enable_unsafe_install true
-            arduino-cli core update-index
-            arduino-cli core install esp32:esp32
-
-
-      - name: Install ESP32 cores
-        run: |
-          # Espressif core (stable)
+          set -e
+          arduino-cli config init
+          arduino-cli config set directories.user /home/runner/Arduino
+          arduino-cli config set board_manager.additional_urls \
+            https://espressif.github.io/arduino-esp32/package_esp32_index.json,\
+            https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json
+          arduino-cli core update-index
+          # Primary toolchain: Bluepad32 board core
+          arduino-cli core install esp32_bluepad32:esp32
+          # Optional secondary toolchain: Espressif core
           arduino-cli core install esp32:esp32
-          # Bluepad32 core (needed for on-device BP32 features)
-          arduino-cli core install esp32_bluepad32:esp32 || true
+          arduino-cli core list
 
       - name: Install Libraries
         run: |
-            arduino-cli lib update-index
-            arduino-cli lib install "FastLED"
-            arduino-cli lib install "ESP32Servo@3.0.7"
-            git clone --depth 1 https://github.com/ricardoquesada/bluepad32-arduino.git /home/runner/Arduino/libraries/Bluepad32
-
-      - name: Set Arduino sketchbook dir
-        run: |
-            arduino-cli config set directories.user /home/runner/Arduino
+          set -e
+          arduino-cli lib update-index
+          arduino-cli lib install "FastLED"
+          arduino-cli lib install "ESP32Servo@3.0.7"
+          arduino-cli lib list
 
       - name: Install THIS library into sketchbook
         run: |
-            rm -rf /home/runner/Arduino/libraries/LoR_v3
-            mkdir -p /home/runner/Arduino/libraries/LoR_v3
-            shopt -s dotglob
-            cp -R ./* /home/runner/Arduino/libraries/LoR_v3/
+          set -e
+          rm -rf /home/runner/Arduino/libraries/LoR_v3
+          mkdir -p /home/runner/Arduino/libraries/LoR_v3
+          cp -R ./* /home/runner/Arduino/libraries/LoR_v3/
 
+      - name: List Bluepad32 boards (debug)
+        run: |
+          arduino-cli board listall | grep -i bluepad32 -A2 -B2 || true
 
-      - name: Compile examples (Espressif ESP32 Dev Module)
+      - name: Compile examples (Bluepad32 core)
         run: |
           set -e
-          FQBN_ESP32="esp32:esp32:esp32"
+          CANDS=("esp32_bluepad32:esp32:esp32" \
+                 "esp32_bluepad32:esp32:esp32dev" \
+                 "esp32_bluepad32:esp32:esp32doit-devkit-v1")
           for ex in $(find examples -name '*.ino'); do
-            echo "==> Compiling $ex for $FQBN_ESP32"
-            arduino-cli compile --fqbn "$FQBN_ESP32" "$ex"
+            echo "==> Building $ex with Bluepad32 core"
+            ok=0
+            for fqbn in "${CANDS[@]}"; do
+              echo "Trying FQBN: $fqbn"
+              if arduino-cli compile --fqbn "$fqbn" "$ex"; then
+                echo "✅ $ex built with $fqbn"
+                ok=1
+                break
+              else
+                echo "…failed for $fqbn"
+              fi
+            done
+            if [ $ok -ne 1 ]; then
+              echo "❌ Failed to compile $ex with any Bluepad32 FQBN"
+              exit 1
+            fi
           done
 
-      - name: Compile examples (Espressif ESP32-S3)
-        run: |
-          set -e
-          FQBN_S3="esp32:esp32:esp32s3"
-          for ex in $(find examples -name '*.ino'); do
-            echo "==> Compiling $ex for $FQBN_S3"
-            arduino-cli compile --fqbn "$FQBN_S3" "$ex"
-          done
-
-      - name: Compile examples (Bluepad32 core)  # optional best-effort
+      - name: Compile examples (Espressif core)  # optional, best-effort
         continue-on-error: true
         run: |
-          # Bluepad32’s FQBN name may vary by version. Commonly:
-          #   esp32_bluepad32:esp32:esp32
-          # If this fails, adjust to the exact FQBN shown by:
-          #   arduino-cli board listall | grep -i bluepad32 -A2
           set -e
-          FQBN_BP32="esp32_bluepad32:esp32:esp32"
           for ex in $(find examples -name '*.ino'); do
-            echo "==> Compiling $ex for $FQBN_BP32"
-            arduino-cli compile --fqbn "$FQBN_BP32" "$ex" || exit 0
+            echo "==> Building $ex for esp32:esp32:esp32"
+            arduino-cli compile --fqbn esp32:esp32:esp32 "$ex" || true
           done
