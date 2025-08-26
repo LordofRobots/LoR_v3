@@ -41,9 +41,9 @@ jobs:
         run: |
           arduino-cli lib update-index
           arduino-cli lib install "FastLED"
-          # Lock to 3.0.7 per your note
           arduino-cli lib install "ESP32Servo@3.0.7"
-          arduino-cli lib install "Bluepad32"
+          arduino-cli lib install --git-url https://github.com/ricardoquesada/bluepad32-arduino.git
+
 
       - name: Compile examples (Espressif ESP32 Dev Module)
         run: |
