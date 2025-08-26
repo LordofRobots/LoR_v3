@@ -1,3 +1,5 @@
+![CI](https://github.com/LordofRobots/LoR_v3/actions/workflows/ci.yml/badge.svg)
+ 
 # LoR_v3 — LoR Core V3 Board Support (Arduino)
 
 Helpers for the **Lord of Robots – LoR Core V3** ESP32 board used in MiniBots.
