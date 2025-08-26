@@ -1,0 +1,55 @@
+#######################################
+# Syntax Coloring Map For LoR_v3
+#######################################
+
+# Datatypes / Classes (KEYWORD1)
+LoRCore          KEYWORD1
+CoreV3           KEYWORD1
+LedStrip         KEYWORD1
+BatteryMonitor   KEYWORD1
+GamepadMgr       KEYWORD1
+MotorOutputs     KEYWORD1
+MotorType        KEYWORD1
+MotorTypeConfig  KEYWORD1
+BatteryState     KEYWORD1
+LedState         KEYWORD1
+
+# Methods (KEYWORD2)
+begin            KEYWORD2
+tick             KEYWORD2
+connected        KEYWORD2
+gamepadConnected KEYWORD2
+bootDiagnosticsLED KEYWORD2
+showState        KEYWORD2
+rainbowStep      KEYWORD2
+off              KEYWORD2
+sample           KEYWORD2
+update           KEYWORD2
+ensurePairModeIfHeld KEYWORD2
+handleBatteryLED KEYWORD2
+axisLeftY        KEYWORD2
+axisRightY       KEYWORD2
+configure        KEYWORD2
+writeDeg         KEYWORD2
+stopAll          KEYWORD2
+
+# Constants / Literals (LITERAL1)
+MG90_CR          LITERAL1
+MG90_Degree      LITERAL1
+N20Plus          LITERAL1
+Victor_SPX       LITERAL1
+Talon_SRX        LITERAL1
+STD_SERVO        LITERAL1
+CUSTOM           LITERAL1
+
+Idle_IceBlue     LITERAL1
+Ok_Green         LITERAL1
+Error_Red        LITERAL1
+Pair_Blink       LITERAL1
+Rainbow_Active   LITERAL1
+Boot_White       LITERAL1
+Boot_Yellow      LITERAL1
+Boot_Green       LITERAL1
+Boot_Blue        LITERAL1
+Boot_PanicRed    LITERAL1
+Boot_Purple      LITERAL1
