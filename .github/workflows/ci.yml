@@ -47,9 +47,11 @@ jobs:
       - name: Install THIS library into sketchbook
         run: |
           set -e
-          rm -rf /home/runner/Arduino/libraries/LoR_v3
-          mkdir -p /home/runner/Arduino/libraries/LoR_v3
-          cp -R ./* /home/runner/Arduino/libraries/LoR_v3/
+          arduino-cli config set directories.user /home/runner/Arduino
+          rm -rf /home/runner/Arduino/libraries/LoR_Core_V3
+          mkdir -p /home/runner/Arduino/libraries/LoR_Core_V3
+          cp -R ./* /home/runner/Arduino/libraries/LoR_Core_V3/
+
 
       - name: List Bluepad32 boards (debug)
         run: |
