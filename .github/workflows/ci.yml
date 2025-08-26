@@ -21,7 +21,7 @@ jobs:
       - name: Set up Arduino CLI
         uses: arduino/setup-arduino-cli@v1
 
-      # IMPORTANT: nuke any stale CLI state so old URLs don't linger
+      # Clean any stale state so old/bad URLs don't linger
       - name: Reset Arduino CLI state
         run: |
           rm -rf /home/runner/.arduino15
@@ -32,16 +32,17 @@ jobs:
           set -e
           arduino-cli config init
           arduino-cli config set directories.user /home/runner/Arduino
-          # Use ONLY these two URLs. The first is Espressif's current boards index.
-          arduino-cli config set board_manager.additional_urls \
-            https://espressif.github.io/arduino-esp32/package_esp32_index.json,\
-            https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json
+          # Add boards indexes WITHOUT commas in the strings
+          arduino-cli config set board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json
+
           echo "=== arduino-cli config ==="
           arduino-cli config dump
+
           arduino-cli core update-index
-          # Primary: Bluepad32 board core
+          # Primary toolchain: Bluepad32 board core
           arduino-cli core install esp32_bluepad32:esp32
-          # Optional: Espressif core (for secondary compile)
+          # Optional: Espressif core for a secondary build
           arduino-cli core install esp32:esp32
           arduino-cli core list
 
