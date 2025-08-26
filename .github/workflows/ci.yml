@@ -41,10 +41,21 @@ jobs:
 
       - name: Install Libraries
         run: |
-          arduino-cli lib update-index
-          arduino-cli lib install "FastLED"
-          arduino-cli lib install "ESP32Servo@3.0.7"
-          arduino-cli lib install --git-url https://github.com/ricardoquesada/bluepad32-arduino.git
+            arduino-cli lib update-index
+            arduino-cli lib install "FastLED"
+            arduino-cli lib install "ESP32Servo@3.0.7"
+            git clone --depth 1 https://github.com/ricardoquesada/bluepad32-arduino.git /home/runner/Arduino/libraries/Bluepad32
+
+      - name: Set Arduino sketchbook dir
+        run: |
+            arduino-cli config set directories.user /home/runner/Arduino
+
+      - name: Install THIS library into sketchbook
+        run: |
+            rm -rf /home/runner/Arduino/libraries/LoR_v3
+            mkdir -p /home/runner/Arduino/libraries/LoR_v3
+            shopt -s dotglob
+            cp -R ./* /home/runner/Arduino/libraries/LoR_v3/
 
 
       - name: Compile examples (Espressif ESP32 Dev Module)
