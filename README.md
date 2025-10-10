@@ -39,7 +39,6 @@ https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/maste
 3. **Library Manager**:
 - Install **FastLED** (latest).
 - Install **ESP32Servo** **v3.0.7**.
-- Install **Bluepad32**.
 4. Clone/copy this repo to:
 - `Documents/Arduino/libraries/LoR_v3/`
 5. Select **Board**: `esp32_bluepad32 → ESP32 Dev Module`.
