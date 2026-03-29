@@ -70,8 +70,24 @@ void GamepadMgr::update() {
   BP32.update();
 }
 
-int16_t GamepadMgr::axisLeftY()  { return _ctl ? _ctl->axisY()  : 0; }
-int16_t GamepadMgr::axisRightY() { return _ctl ? _ctl->axisRY() : 0; }
+int16_t GamepadMgr::axisLeftY()  { return _ctl ? _ctl->axisY()  : 0; }// (-511 - 512) left Y axis
+int16_t GamepadMgr::axisRightY() { return _ctl ? _ctl->axisRY() : 0; }// (-511 - 512) right Y axis
+int16_t GamepadMgr::axisLeftX()  { return _ctl ? _ctl->axisX()  : 0; }// (-511 - 512) left X Axis
+int16_t GamepadMgr::axisRightX() { return _ctl ? _ctl->axisRX() : 0; }// (-511 - 512) right X axis
+int16_t GamepadMgr::axisR2() { return _ctl ? _ctl->throttle() : 0; }// (0 - 1023): throttle (AKA gas) button
+int16_t GamepadMgr::axisL2() { return _ctl ? _ctl->brake() : 0; }// (0 - 1023): brake button
+int16_t GamepadMgr::index() { return _ctl ? _ctl->index() : 0; }// Controller Index
+int16_t GamepadMgr::dpad() { return _ctl ? _ctl->dpad() : 0; }// D-pad
+int16_t GamepadMgr::buttons() { return _ctl ? _ctl->buttons() : 0; }// bitmask of pressed buttons
+int16_t GamepadMgr::miscButtons() { return _ctl ? _ctl->miscButtons() : 0; }// bitmask of pressed "misc" buttons
+int16_t GamepadMgr::gyroX() { return _ctl ? _ctl->gyroX() : 0; }// Gyro X
+int16_t GamepadMgr::gyroY() { return _ctl ? _ctl->gyroY() : 0; }// Gyro Y
+int16_t GamepadMgr::gyroZ() { return _ctl ? _ctl->gyroZ() : 0; }// Gyro Z
+int16_t GamepadMgr::accelX() { return _ctl ? _ctl->accelX() : 0; }// Accelerometer X
+int16_t GamepadMgr::accelY() { return _ctl ? _ctl->accelY() : 0; }// Accelerometer Y
+int16_t GamepadMgr::accelZ() { return _ctl ? _ctl->accelZ() : 0; }// Accelerometer Z
+
+
 
 void GamepadMgr::handleBatteryLED() {
   if (!_ctl) return;
